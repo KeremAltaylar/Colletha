@@ -7,7 +7,6 @@ var zoff = 0;
 var particles = [];
 var particles2 = [];
 var flowfield;
-var magv;
 var cr = fxrandRange(0, 200, 1);
 var cg = fxrandRange(100, 110, 1);
 var cb = fxrandRange(200, 250, 1);
@@ -18,6 +17,10 @@ var indexk = 0;
 var sw1 = fxrandRange(0.1, 0.5, 0.1);
 var sw2 = fxrandRange(0.1, 0.5, 0.1);
 let speed2 = fxrandRange(10, 30, 10);
+var r1x = [];
+var r1y = [];
+var r2x = [];
+var r2y = [];
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -27,23 +30,27 @@ function setup() {
   fr = createP("");
   flowfield = new Array(cols * rows);
   for (i = 0; i < 200; i++) {
+    r1x[i] = fxrand() * i;
+    r1y[i] = fxrand() * i;
     particles[i] = new Particle(
       cr,
       cg,
       cb,
-      (fxrand() * i) / 5 + windowWidth / 3,
-      (fxrand() * i) / 3 + windowHeight / 3,
+      r1x[i] / 5 + windowWidth / 3,
+      r1y[i] / 3 + windowHeight / 3,
       sw1,
       10
     );
   }
   for (i = 0; i < 300; i++) {
+    r2x[i] = fxrand() * i;
+    r2y[i] = fxrand() * i;
     particles2[i] = new Particle2(
       dr,
       dg,
       db,
-      (fxrand() * i) / 2 + windowWidth / 8,
-      (fxrand() * i) / 5 + windowHeight / 7,
+      r2x[i] / 2 + windowWidth / 8,
+      r2y[i] / 5 + windowHeight / 7,
       sw2,
       10
     );
@@ -64,10 +71,10 @@ function draw() {
     var xoff = 0;
     for (var x = 0; x < cols; x++) {
       var index = x + y * cols;
-      flowfield[index] = v;
       var angle = xoff * zoff;
       var v = p5.Vector.fromAngle(angle);
       v.setMag(magv);
+      flowfield[index] = v;
       xoff += inc;
       // stroke(255, 130);
       // push();
@@ -116,56 +123,34 @@ function draw() {
   rect(20, 20, windowWidth - 40, windowHeight - 40);
 }
 function windowResized() {
-  background(255);
   resizeCanvas(windowWidth, windowHeight);
-  indexk = 0;
-  loop();
   cols = floor(windowWidth / scl);
   rows = floor(windowHeight / scl);
-  //fr = createP("");
   flowfield = new Array(cols * rows);
-
   for (i = 0; i < 200; i++) {
     particles[i] = new Particle(
       cr,
       cg,
       cb,
-      (fxrand() * i) / 5 + windowWidth / 3,
-      (fxrand() * i) / 3 + windowHeight / 3,
+      r1x[i] / 5 + windowWidth / 3,
+      r1y[i] / 3 + windowHeight / 3,
       sw1,
-      speed2
+      10
     );
   }
-  for (i = 0; i < 600; i++) {
+  for (i = 0; i < 300; i++) {
     particles2[i] = new Particle2(
       dr,
       dg,
       db,
-      (fxrand() * i) / 2 + windowWidth / 8,
-      (fxrand() * i) / 5 + windowHeight / 7,
+      r2x[i] / 2 + windowWidth / 8,
+      r2y[i] / 5 + windowHeight / 7,
       sw2,
-      i
+      10
     );
   }
-  push();
-  rectMode(RADIUS);
-  fill(255, 0.6 * sin(millis() * 2000));
-  noStroke();
-  rect(
-    windowWidth / 2,
-    windowHeight / 2,
-    windowWidth / 2 - 30,
-    windowHeight / 2 - 30
-  );
-  pop();
-  indexk = indexk + 1;
-  //console.log(indexk);
-  stroke(0);
-  strokeWeight(20);
-  rect(10, 10, windowWidth - 20, windowHeight - 20);
-  stroke(0);
-  strokeWeight(20);
-  rect(20, 20, windowWidth - 40, windowHeight - 40);
+  indexk = 0;
+  loop();
 }
 
 function fxrandRange(min, max, step) {
@@ -178,3 +163,13 @@ window.$fxhashFeatures = {
   INT: inc,
   FLO: scl,
 };
+
+function keyPressed() {
+  if (key === 's' || key === 'S') {
+    saveCanvas('colletha-' + fxhash, 'png');
+  }
+}
+
+function mousePressed() {
+  location.reload();
+}
